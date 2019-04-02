@@ -259,43 +259,6 @@ def show_next(dataloader, model, LABEL):
     raw_cam = calc_cam(inputs, LABEL, model)
     
     # create predictions for label of interest and all labels
-    pred = model(torch.autograd.Variable(original.cpu())).data.numpy()[0]
-    predx = ['%.3f' % elem for elem in list(pred)]
+    pred = model(torch.autograd.Variable(original.cpu()))
     
-    fig, (showcxr,heatmap) =plt.subplots(ncols=2,figsize=(14,5))
-    
-    hmap = sns.heatmap(raw_cam.squeeze(),
-            cmap = 'viridis',
-            alpha = 0.3, # whole heatmap is translucent
-            annot = True,
-            zorder = 2,square=True,vmin=-5,vmax=5
-            )
-    
-    cxr=inputs.numpy().squeeze().transpose(1,2,0)    
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    cxr = std * cxr + mean
-    cxr = np.clip(cxr, 0, 1)
-        
-    hmap.imshow(cxr,
-          aspect = hmap.get_aspect(),
-          extent = hmap.get_xlim() + hmap.get_ylim(),
-          zorder = 1) #put the map under the heatmap
-    hmap.axis('off')
-    hmap.set_title("P("+LABEL+")="+str(predx[label_index]))
-    
-    showcxr.imshow(cxr)
-    showcxr.axis('off')
-    showcxr.set_title(filename[0])
-    plt.savefig(str(LABEL+"_P"+str(predx[label_index])+"_file_"+filename[0]))
-    plt.show()
-    
-    
-        
-    preds_concat=pd.concat([pd.Series(FINDINGS),pd.Series(predx),pd.Series(labels.numpy().astype(bool)[0])],axis=1)
-    preds = pd.DataFrame(data=preds_concat)
-    preds.columns=["Finding","Predicted Probability","Ground Truth"]
-    preds.set_index("Finding",inplace=True)
-    preds.sort_values(by='Predicted Probability',inplace=True,ascending=False)
-    
-    return preds
+    return pred
